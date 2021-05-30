@@ -1,7 +1,7 @@
 ﻿//
 //  Menus.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2020
+//  Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Globalization;
@@ -149,7 +149,9 @@ namespace IdentityManagement.Services.Console.Application
 
         private void WriteMainMenu()
         {
+#if _ENABLE_CLS
             System.Console.Clear();
+#endif
             System.Console.WriteLine("IDENTITY MANAGEMENT: MAIN MENU ({0})", identityManager.Domain);
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
@@ -162,7 +164,9 @@ namespace IdentityManagement.Services.Console.Application
 
         private void WriteManageUsersMenu()
         {
+#if _ENABLE_CLS
             System.Console.Clear();
+#endif
             System.Console.WriteLine("IDENTITY MANAGEMENT: MANAGE USERS MENU ({0})", identityManager.Domain);
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
@@ -180,7 +184,9 @@ namespace IdentityManagement.Services.Console.Application
 
         private void WriteManageUsersSubmenu()
         {
+#if _ENABLE_CLS
             System.Console.Clear();
+#endif
             System.Console.WriteLine("IDENTITY MANAGEMENT: MANAGE USERS SUBMENU -> GET USERS ({0})", identityManager.Domain);
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
@@ -193,7 +199,9 @@ namespace IdentityManagement.Services.Console.Application
 
         private void WriteManageGroupsMenu()
         {
+#if _ENABLE_CLS
             System.Console.Clear();
+#endif
             System.Console.WriteLine("IDENTITY MANAGEMENT: MANAGE GROUPS MENU ({0})", identityManager.Domain);
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
@@ -213,7 +221,9 @@ namespace IdentityManagement.Services.Console.Application
 
         private void WriteManageGroupSubmenu()
         {
+#if _ENABLE_CLS
             System.Console.Clear();
+#endif
             System.Console.WriteLine("IDENTITY MANAGEMENT: MANAGE GROUPS SUBMENU -> GET GROUPS ({0})", identityManager.Domain);
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");

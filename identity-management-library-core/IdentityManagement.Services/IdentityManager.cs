@@ -1,8 +1,10 @@
 ﻿//
 //  IdentityManager.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2020
+//  Wiregrass Code Technology 2020-2021
 //
+using System;
+using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using Microsoft.Graph.Auth;
@@ -79,7 +81,7 @@ namespace IdentityManagement.Services
 
             var authenticationProvider = new ClientCredentialProvider(confidentialClientApplication);
 
-            client = new GraphServiceClient(authenticationProvider);
+            client = new GraphServiceClient(authenticationProvider) { HttpProvider = { OverallTimeout = GetTimeout() } };
         }
 
         private void SetPublicProperties()
@@ -87,6 +89,16 @@ namespace IdentityManagement.Services
             Domain = configuration["Domain"];
             UserServices = new UserServices(client, configuration);
             GroupServices = new GroupServices(client, UserServices);
+        }
+
+        private TimeSpan GetTimeout()
+        {
+            double seconds = 5;
+            if (!string.IsNullOrEmpty(configuration["Timeout"]))
+            {
+                seconds = double.Parse(configuration["Timeout"], CultureInfo.InvariantCulture);
+            }
+            return TimeSpan.FromSeconds(seconds);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿//
 //  ManageUsers.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2020
+//  Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Collections.Generic;
@@ -397,7 +397,7 @@ namespace IdentityManagement.Services.Console.Application
         private static int ReadLimit()
         {
             System.Console.WriteLine("");
-            System.Console.Write("- limit (top users)    : ");
+            System.Console.Write("ENTER TOP USERS LIMIT: ");
 
             var line = System.Console.ReadLine();
 
@@ -435,15 +435,15 @@ namespace IdentityManagement.Services.Console.Application
 
             var userModel = new UserModel
             {
-                DisplayName   = GetInputField("display name", 20),
-                GivenName     = GetInputField("given name", 20),
-                Surname       = GetInputField("surname", 20),
+                DisplayName = GetInputField("display name", 20),
+                GivenName = GetInputField("given name", 20),
+                Surname = GetInputField("surname", 20),
                 StreetAddress = GetInputField("street address", 20),
-                City          = GetInputField("city", 20),
-                State         = GetInputField("state", 20),
-                PostalCode    = GetInputField("postal code", 20),
-                CompanyName   = GetInputField("company name", 20),
-                Department    = GetInputField("department", 20)
+                City = GetInputField("city", 20),
+                State = GetInputField("state", 20),
+                PostalCode = GetInputField("postal code", 20),
+                CompanyName = GetInputField("company name", 20),
+                Department = GetInputField("department", 20)
             };
 
             userModel.SetIdentity(username);

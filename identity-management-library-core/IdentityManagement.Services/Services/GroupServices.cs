@@ -1,7 +1,7 @@
 ﻿//
 //  GroupServices.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2020
+//  Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Collections.Generic;
@@ -158,10 +158,10 @@ namespace IdentityManagement.Services
                 .Request()
                 .AddAsync(new Group
                 {
-                    DisplayName     = groupModel.DisplayName,
-                    Description     = groupModel.Description,
-                    MailEnabled     = false,
-                    MailNickname    = groupModel.DisplayName,
+                    DisplayName = groupModel.DisplayName,
+                    Description = groupModel.Description,
+                    MailEnabled = false,
+                    MailNickname = groupModel.DisplayName,
                     SecurityEnabled = true
                 });
 
@@ -406,11 +406,11 @@ namespace IdentityManagement.Services
         {
             var groupModel = new GroupModel
             {
-                Id              = group.Id,
+                Id = group.Id,
                 SecurityEnabled = group.SecurityEnabled,
                 CreatedDateTime = group.CreatedDateTime,
-                DisplayName     = group.DisplayName,
-                Description     = group.Description
+                DisplayName = group.DisplayName,
+                Description = group.Description
             };
             return groupModel;
         }

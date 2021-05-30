@@ -1,7 +1,7 @@
 ﻿//
 //  UserServices.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2020
+//  Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Collections.Generic;
@@ -365,28 +365,28 @@ namespace IdentityManagement.Services
         {
             var userModel = new UserModel
             {
-                Id              = user.Id,
-                AccountEnabled  = user.AccountEnabled,
+                Id = user.Id,
+                AccountEnabled = user.AccountEnabled,
                 CreatedDateTime = user.CreatedDateTime,
-                CreationType    = user.CreationType,
+                CreationType = user.CreationType,
                 DeletedDateTime = user.DeletedDateTime,
-                DisplayName     = user.DisplayName,
-                GivenName       = user.GivenName,
-                Surname         = user.Surname,
-                StreetAddress   = user.StreetAddress,
-                City            = user.City,
-                State           = user.State,
-                PostalCode      = user.PostalCode,
-                CompanyName     = user.CompanyName,
-                Department      = user.Department
+                DisplayName = user.DisplayName,
+                GivenName = user.GivenName,
+                Surname = user.Surname,
+                StreetAddress = user.StreetAddress,
+                City = user.City,
+                State = user.State,
+                PostalCode = user.PostalCode,
+                CompanyName = user.CompanyName,
+                Department = user.Department
             };
 
             if (user.Identities != null)
             {
                 IList<ObjectIdentity> identities = user.Identities.Select(identity => new ObjectIdentity
                 {
-                    SignInType       = identity.SignInType,
-                    Issuer           = identity.Issuer,
+                    SignInType = identity.SignInType,
+                    Issuer = identity.Issuer,
                     IssuerAssignedId = identity.IssuerAssignedId
                 }).ToList();
 
