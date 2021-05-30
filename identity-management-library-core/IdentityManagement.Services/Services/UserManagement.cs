@@ -1,7 +1,7 @@
 ﻿//
-//  UserServices.cs
+//  UserManagement.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Collections.Generic;
@@ -12,12 +12,12 @@ using Microsoft.Graph;
 
 namespace IdentityManagement.Services
 {
-    public class UserServices : IUserServices
+    public class UserManagement : IUserManagement
     {
         private readonly GraphServiceClient client;
         private readonly IConfigurationSection configuration;
 
-        public UserServices(GraphServiceClient graphServiceClient, IConfigurationSection configurationSection)
+        public UserManagement(GraphServiceClient graphServiceClient, IConfigurationSection configurationSection)
         {
             client = graphServiceClient;
             configuration = configurationSection;
@@ -44,12 +44,14 @@ namespace IdentityManagement.Services
                     u.DisplayName,
                     u.GivenName,
                     u.Surname,
+                    u.CompanyName,
+                    u.Department,
                     u.StreetAddress,
                     u.City,
                     u.State,
                     u.PostalCode,
-                    u.CompanyName,
-                    u.Department
+                    u.Mail,
+                    u.OtherMails
                 })
                 .GetAsync();
 
@@ -77,12 +79,14 @@ namespace IdentityManagement.Services
                     u.DisplayName,
                     u.GivenName,
                     u.Surname,
+                    u.CompanyName,
+                    u.Department,
                     u.StreetAddress,
                     u.City,
                     u.State,
                     u.PostalCode,
-                    u.CompanyName,
-                    u.Department
+                    u.Mail,
+                    u.OtherMails
                 })
                 .GetAsync();
 
@@ -111,12 +115,14 @@ namespace IdentityManagement.Services
                         u.DisplayName,
                         u.GivenName,
                         u.Surname,
+                        u.CompanyName,
+                        u.Department,
                         u.StreetAddress,
                         u.City,
                         u.State,
                         u.PostalCode,
-                        u.CompanyName,
-                        u.Department
+                        u.Mail,
+                        u.OtherMails
                     })
                     .GetAsync();
 
@@ -130,6 +136,77 @@ namespace IdentityManagement.Services
                 }
                 throw;
             }
+        }
+
+        public async Task<string> CreateUser(UserModel userModel)
+        {
+            if (userModel == null)
+            {
+                throw new ArgumentNullException(nameof(userModel));
+            }
+
+            SetIdentityIssuer(userModel);
+
+            var user = await client.Users
+                .Request()
+                .AddAsync(userModel);
+
+            return user.Id;
+        }
+
+        public async Task<bool> DeleteUser(string userName)
+        {
+            if (string.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+
+            var userObjectId = GetUserObjectId(userName);
+            if (userObjectId == null)
+            {
+                return false;
+            }
+
+            await client.Users[userObjectId]
+                .Request()
+                .DeleteAsync();
+
+            return true;
+        }
+
+        public async Task<bool> SetUserPasswordByObjectId(string userName, string replacementPassword)
+        {
+            if (string.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+
+            if (string.IsNullOrEmpty(replacementPassword))
+            {
+                throw new ArgumentNullException(nameof(replacementPassword));
+            }
+
+            var userObjectId = GetUserObjectId(userName);
+            if (userObjectId == null)
+            {
+                return false;
+            }
+
+            var user = new User
+            {
+                PasswordPolicies = "DisablePasswordExpiration",
+                PasswordProfile = new PasswordProfile
+                {
+                    ForceChangePasswordNextSignIn = false,
+                    Password = replacementPassword
+                }
+            };
+
+            await client.Users[userObjectId]
+                .Request()
+                .UpdateAsync(user);
+
+            return true;
         }
 
         public async Task<IList<UserModel>> GetUsers(int limit)
@@ -153,12 +230,14 @@ namespace IdentityManagement.Services
                     u.DisplayName,
                     u.GivenName,
                     u.Surname,
+                    u.CompanyName,
+                    u.Department,
                     u.StreetAddress,
                     u.City,
                     u.State,
                     u.PostalCode,
-                    u.CompanyName,
-                    u.Department
+                    u.Mail,
+                    u.OtherMails
                 })
                 .GetAsync();
 
@@ -205,12 +284,14 @@ namespace IdentityManagement.Services
                     u.DisplayName,
                     u.GivenName,
                     u.Surname,
+                    u.CompanyName,
+                    u.Department,
                     u.StreetAddress,
                     u.City,
                     u.State,
                     u.PostalCode,
-                    u.CompanyName,
-                    u.Department
+                    u.Mail,
+                    u.OtherMails
                 })
                 .GetAsync();
 
@@ -275,77 +356,6 @@ namespace IdentityManagement.Services
             return groupMembership;
         }
 
-        public async Task<bool> SetUserPasswordByObjectId(string userName, string replacementPassword)
-        {
-            if (string.IsNullOrEmpty(userName))
-            {
-                throw new ArgumentNullException(nameof(userName));
-            }
-
-            if (string.IsNullOrEmpty(replacementPassword))
-            {
-                throw new ArgumentNullException(nameof(replacementPassword));
-            }
-
-            var userObjectId = GetUserObjectId(userName);
-            if (userObjectId == null)
-            {
-                return false;
-            }
-
-            var user = new User
-            {
-                PasswordPolicies = "DisablePasswordExpiration,DisableStrongPassword",
-                PasswordProfile = new PasswordProfile
-                {
-                    ForceChangePasswordNextSignIn = false,
-                    Password = replacementPassword
-                }
-            };
-
-            await client.Users[userObjectId]
-                .Request()
-                .UpdateAsync(user);
-
-            return true;
-        }
-
-        public async Task<string> CreateUser(UserModel userModel)
-        {
-            if (userModel == null)
-            {
-                throw new ArgumentNullException(nameof(userModel));
-            }
-
-            SetIdentityIssuer(userModel);
-
-            var user = await client.Users
-                .Request()
-                .AddAsync(userModel);
-
-            return user.Id;
-        }
-
-        public async Task<bool> DeleteUser(string userName)
-        {
-            if (string.IsNullOrEmpty(userName))
-            {
-                throw new ArgumentNullException(nameof(userName));
-            }
-
-            var userObjectId = GetUserObjectId(userName);
-            if (userObjectId == null)
-            {
-                return false;
-            }
-
-            await client.Users[userObjectId]
-                .Request()
-                .DeleteAsync();
-
-            return true;
-        }
-
         public string GetUserName(UserModel userModel)
         {
             if (userModel == null)
@@ -361,6 +371,13 @@ namespace IdentityManagement.Services
             return username;
         }
 
+        private string GetUserObjectId(string userName)
+        {
+            var user = Task.Run(async () => await GetUserBySignInName(userName)).Result;
+
+            return user?.Id;
+        }
+
         private static UserModel CreateUserModel(User user)
         {
             var userModel = new UserModel
@@ -373,12 +390,14 @@ namespace IdentityManagement.Services
                 DisplayName = user.DisplayName,
                 GivenName = user.GivenName,
                 Surname = user.Surname,
+                CompanyName = user.CompanyName,
+                Department = user.Department,
                 StreetAddress = user.StreetAddress,
                 City = user.City,
                 State = user.State,
                 PostalCode = user.PostalCode,
-                CompanyName = user.CompanyName,
-                Department = user.Department
+                Mail = user.Mail,
+                OtherMails = user.OtherMails
             };
 
             if (user.Identities != null)
@@ -401,26 +420,6 @@ namespace IdentityManagement.Services
             return userModel;
         }
 
-        private async Task<Group> GetGroupDisplayName(string groupObjectId)
-        {
-            var group = await client.Groups[groupObjectId]
-                .Request()
-                .Select(g => new
-                {
-                    g.DisplayName
-                })
-                .GetAsync();
-
-            return group;
-        }
-
-        private string GetUserObjectId(string userName)
-        {
-            var user = Task.Run(async () => await GetUserBySignInName(userName)).Result;
-
-            return user?.Id;
-        }
-
         private void SetIdentityIssuer(UserModel userModel)
         {
             if (userModel.Identities != null)
@@ -433,6 +432,19 @@ namespace IdentityManagement.Services
                     }
                 }
             }
+        }
+
+        private async Task<Group> GetGroupDisplayName(string groupObjectId)
+        {
+            var group = await client.Groups[groupObjectId]
+                .Request()
+                .Select(g => new
+                {
+                    g.DisplayName
+                })
+                .GetAsync();
+
+            return group;
         }
     }
 }

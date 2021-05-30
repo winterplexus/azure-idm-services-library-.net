@@ -1,7 +1,7 @@
 ﻿//
-//  GroupServices.cs
+//  GroupManagement.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Collections.Generic;
@@ -11,15 +11,15 @@ using Microsoft.Graph;
 
 namespace IdentityManagement.Services
 {
-    public class GroupServices : IGroupServices
+    public class GroupManagement : IGroupManagement
     {
         private readonly GraphServiceClient client;
-        private readonly IUserServices userServices;
+        private readonly IUserManagement userServices;
 
-        public GroupServices(GraphServiceClient graphServiceClient, IUserServices userServices)
+        public GroupManagement(GraphServiceClient graphServiceClient, IUserManagement userManagemennt)
         {
             client = graphServiceClient;
-            this.userServices = userServices;
+            userServices = userManagemennt;
         }
 
         public async Task<GroupModel> GetGroupByGroupName(string groupName)
@@ -158,11 +158,10 @@ namespace IdentityManagement.Services
                 .Request()
                 .AddAsync(new Group
                 {
+                    SecurityEnabled = true,
                     DisplayName = groupModel.DisplayName,
                     Description = groupModel.Description,
-                    MailEnabled = false,
-                    MailNickname = groupModel.DisplayName,
-                    SecurityEnabled = true
+                    MailEnabled = false
                 });
 
             return group.Id;
@@ -182,6 +181,143 @@ namespace IdentityManagement.Services
             }
 
             await client.Groups[groupObjectId]
+                .Request()
+                .DeleteAsync();
+
+            return true;
+        }
+
+        public async Task<IList<UserModel>> GetGroupOwners(string groupName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+            {
+                throw new ArgumentNullException(nameof(groupName));
+            }
+
+            var groupObjectId = GetGroupObjectId(groupName);
+            if (groupObjectId == null)
+            {
+                return null;
+            }
+
+            var group = await client.Groups[groupObjectId]
+                .Request()
+                .Expand("owners")
+                .GetAsync();
+
+            var owners = group.Owners;
+
+            var ownersCount = owners.Count;
+            if (ownersCount < 1)
+            {
+                return null;
+            }
+
+            var groupMembers = new List<UserModel>();
+
+            do
+            {
+                groupMembers.AddRange(owners.Select(owner => userServices.GetUserByObjectId(owner.Id).Result));
+            }
+            while (owners.NextPageRequest != null && (owners = await owners.NextPageRequest.GetAsync()).Count > 0);
+
+            return groupMembers;
+        }
+
+        public async Task<IList<UserModel>> GetGroupMembers(string groupName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+            {
+                throw new ArgumentNullException(nameof(groupName));
+            }
+
+            var groupObjectId = GetGroupObjectId(groupName);
+            if (groupObjectId == null)
+            {
+                return null;
+            }
+
+            var group = await client.Groups[groupObjectId]
+                .Request()
+                .Expand("members")
+                .GetAsync();
+
+            var members = group.Members;
+
+            var membersCount = members.Count;
+            if (membersCount < 1)
+            {
+                return null;
+            }
+
+            var groupMembers = new List<UserModel>();
+
+            do
+            {
+                groupMembers.AddRange(members.Select(member => userServices.GetUserByObjectId(member.Id).Result));
+            }
+            while (members.NextPageRequest != null && (members = await members.NextPageRequest.GetAsync()).Count > 0);
+
+            return groupMembers;
+        }
+
+        public async Task<bool> AddOwnerToGroup(string groupName, string userName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+            {
+                throw new ArgumentNullException(nameof(groupName));
+            }
+            if (string.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+
+            var groupObjectId = GetGroupObjectId(groupName);
+            if (groupObjectId == null)
+            {
+                return false;
+            }
+            var userObjectId = GetUserObjectId(userName);
+            if (userObjectId == null)
+            {
+                return false;
+            }
+
+            var userDirectoryObject = new DirectoryObject
+            {
+                Id = userObjectId
+            };
+
+            await client.Groups[groupObjectId].Owners.References
+                .Request()
+                .AddAsync(userDirectoryObject);
+
+            return true;
+        }
+
+        public async Task<bool> RemoveOwnerFromGroup(string groupName, string userName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+            {
+                throw new ArgumentNullException(nameof(groupName));
+            }
+            if (string.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+
+            var groupObjectId = GetGroupObjectId(groupName);
+            if (groupObjectId == null)
+            {
+                return false;
+            }
+            var userObjectId = GetUserObjectId(userName);
+            if (userObjectId == null)
+            {
+                return false;
+            }
+
+            await client.Groups[groupObjectId].Owners[userObjectId].Reference
                 .Request()
                 .DeleteAsync();
 
@@ -249,143 +385,6 @@ namespace IdentityManagement.Services
                 .DeleteAsync();
 
             return true;
-        }
-
-        public async Task<bool> AddOwnerToGroup(string groupName, string userName)
-        {
-            if (string.IsNullOrEmpty(groupName))
-            {
-                throw new ArgumentNullException(nameof(groupName));
-            }
-            if (string.IsNullOrEmpty(userName))
-            {
-                throw new ArgumentNullException(nameof(userName));
-            }
-
-            var groupObjectId = GetGroupObjectId(groupName);
-            if (groupObjectId == null)
-            {
-                return false;
-            }
-            var userObjectId = GetUserObjectId(userName);
-            if (userObjectId == null)
-            {
-                return false;
-            }
-
-            var userDirectoryObject = new DirectoryObject
-            {
-                Id = userObjectId
-            };
-
-            await client.Groups[groupObjectId].Owners.References
-                .Request()
-                .AddAsync(userDirectoryObject);
-
-            return true;
-        }
-
-        public async Task<bool> RemoveOwnerFromGroup(string groupName, string userName)
-        {
-            if (string.IsNullOrEmpty(groupName))
-            {
-                throw new ArgumentNullException(nameof(groupName));
-            }
-            if (string.IsNullOrEmpty(userName))
-            {
-                throw new ArgumentNullException(nameof(userName));
-            }
-
-            var groupObjectId = GetGroupObjectId(groupName);
-            if (groupObjectId == null)
-            {
-                return false;
-            }
-            var userObjectId = GetUserObjectId(userName);
-            if (userObjectId == null)
-            {
-                return false;
-            }
-
-            await client.Groups[groupObjectId].Owners[userObjectId].Reference
-                .Request()
-                .DeleteAsync();
-
-            return true;
-        }
-
-        public async Task<IList<UserModel>> GetGroupMembers(string groupName)
-        {
-            if (string.IsNullOrEmpty(groupName))
-            {
-                throw new ArgumentNullException(nameof(groupName));
-            }
-
-            var groupObjectId = GetGroupObjectId(groupName);
-            if (groupObjectId == null)
-            {
-                return null;
-            }
-
-            var group = await client.Groups[groupObjectId]
-                .Request()
-                .Expand("members")
-                .GetAsync();
-
-            var members = group.Members;
-
-            var membersCount = members.Count;
-            if (membersCount < 1)
-            {
-                return null;
-            }
-
-            var groupMembers = new List<UserModel>();
-
-            do
-            {
-                groupMembers.AddRange(members.Select(member => userServices.GetUserByObjectId(member.Id).Result));
-            }
-            while (members.NextPageRequest != null && (members = await members.NextPageRequest.GetAsync()).Count > 0);
-
-            return groupMembers;
-        }
-
-        public async Task<IList<UserModel>> GetGroupOwners(string groupName)
-        {
-            if (string.IsNullOrEmpty(groupName))
-            {
-                throw new ArgumentNullException(nameof(groupName));
-            }
-
-            var groupObjectId = GetGroupObjectId(groupName);
-            if (groupObjectId == null)
-            {
-                return null;
-            }
-
-            var group = await client.Groups[groupObjectId]
-                .Request()
-                .Expand("owners")
-                .GetAsync();
-
-            var owners = group.Owners;
-
-            var ownersCount = owners.Count;
-            if (ownersCount < 1)
-            {
-                return null;
-            }
-
-            var groupMembers = new List<UserModel>();
-
-            do
-            {
-                groupMembers.AddRange(owners.Select(owner => userServices.GetUserByObjectId(owner.Id).Result));
-            }
-            while (owners.NextPageRequest != null && (owners = await owners.NextPageRequest.GetAsync()).Count > 0);
-
-            return groupMembers;
         }
 
         private string GetGroupObjectId(string groupName)

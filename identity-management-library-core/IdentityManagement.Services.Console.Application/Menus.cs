@@ -1,7 +1,7 @@
 ﻿//
 //  Menus.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Globalization;
@@ -62,11 +62,11 @@ namespace IdentityManagement.Services.Console.Application
                               break;
                     case "4": ProcessManageUsersSubmenu();
                               break;
-                    case "5": manageUsers.SetUserPassword();
+                    case "5": manageUsers.CreateUser();
                               break;
-                    case "6": manageUsers.CreateUser();
+                    case "6": manageUsers.DeleteUser();
                               break;
-                    case "7": manageUsers.DeleteUser();
+                    case "7": manageUsers.SetUserPassword();
                               break;
                     case "M": return;
                 }
@@ -114,13 +114,13 @@ namespace IdentityManagement.Services.Console.Application
                               break;
                     case "5": manageGroups.DeleteGroup();
                               break;
-                    case "6": manageGroups.AddMemberToGroup();
+                    case "6": manageGroups.AddOwnerToGroup();
                               break;
-                    case "7": manageGroups.RemoveMemberToGroup();
+                    case "7": manageGroups.RemoveOwnerToGroup();
                               break;
-                    case "8": manageGroups.AddOwnerToGroup();
+                    case "8": manageGroups.AddMemberToGroup();
                               break;
-                    case "9": manageGroups.RemoveOwnerToGroup();
+                    case "9": manageGroups.RemoveMemberToGroup();
                               break;
                     case "M": return;
                 }
@@ -152,7 +152,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine("IDENTITY MANAGEMENT: MAIN MENU ({0})", identityManager.Domain);
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MAIN MENU ({identityManager.Domain})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
@@ -167,7 +167,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine("IDENTITY MANAGEMENT: MANAGE USERS MENU ({0})", identityManager.Domain);
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE USERS MENU ({identityManager.Domain})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
@@ -175,9 +175,9 @@ namespace IdentityManagement.Services.Console.Application
             System.Console.WriteLine("[ 2 ]   GET USER BY DISPLAY NAME");
             System.Console.WriteLine("[ 3 ]   GET USER BY OBJECT ID");
             System.Console.WriteLine("[ 4 ]   GET USERS");
-            System.Console.WriteLine("[ 5 ]   SET USER PASSWORD");
-            System.Console.WriteLine("[ 6 ]   CREATE USER");
-            System.Console.WriteLine("[ 7 ]   DELETE USER");
+            System.Console.WriteLine("[ 5 ]   CREATE USER");
+            System.Console.WriteLine("[ 6 ]   DELETE USER");
+            System.Console.WriteLine("[ 7 ]   SET USER PASSWORD");
             System.Console.WriteLine("[ M ]   MAIN MENU");
             System.Console.WriteLine("================================================================================");
         }
@@ -187,7 +187,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine("IDENTITY MANAGEMENT: MANAGE USERS SUBMENU -> GET USERS ({0})", identityManager.Domain);
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE USERS SUBMENU -> GET USERS ({identityManager.Domain})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
@@ -202,7 +202,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine("IDENTITY MANAGEMENT: MANAGE GROUPS MENU ({0})", identityManager.Domain);
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE GROUPS MENU ({identityManager.Domain})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
@@ -211,10 +211,10 @@ namespace IdentityManagement.Services.Console.Application
             System.Console.WriteLine("[ 3 ]   GET GROUPS");
             System.Console.WriteLine("[ 4 ]   CREATE GROUP");
             System.Console.WriteLine("[ 5 ]   DELETE GROUP");
-            System.Console.WriteLine("[ 6 ]   ADD USER TO GROUP");
-            System.Console.WriteLine("[ 7 ]   REMOVE USER FROM GROUP");
-            System.Console.WriteLine("[ 8 ]   ADD OWNER TO GROUP");
-            System.Console.WriteLine("[ 9 ]   REMOVE OWNER FROM GROUP");
+            System.Console.WriteLine("[ 6 ]   ADD OWNER TO GROUP");
+            System.Console.WriteLine("[ 7 ]   REMOVE OWNER FROM GROUP");
+            System.Console.WriteLine("[ 8 ]   ADD USER TO GROUP");
+            System.Console.WriteLine("[ 9 ]   REMOVE USER FROM GROUP");
             System.Console.WriteLine("[ M ]   MAIN MENU");
             System.Console.WriteLine("================================================================================");
         }
@@ -224,7 +224,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine("IDENTITY MANAGEMENT: MANAGE GROUPS SUBMENU -> GET GROUPS ({0})", identityManager.Domain);
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE GROUPS SUBMENU -> GET GROUPS ({identityManager.Domain})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
@@ -237,9 +237,9 @@ namespace IdentityManagement.Services.Console.Application
         private static void WriteUnexpectedException(Exception ex)
         {
             System.Console.ForegroundColor = ConsoleColor.Red;
-            System.Console.WriteLine("unexcepted exception-> {0}", ex.Message);
-            System.Console.WriteLine("inner exception-> {0}", ex.InnerException?.Message);
-            System.Console.WriteLine("stack trace-> {0}{1}", Environment.NewLine, ex.StackTrace);
+            System.Console.WriteLine($"unexcepted exception-> {ex.Message}");
+            System.Console.WriteLine($"inner exception-> {ex.InnerException?.Message}");
+            System.Console.WriteLine($"stack trace-> {Environment.NewLine}{ex.StackTrace}");
             System.Console.ResetColor();
         }
 
@@ -256,7 +256,7 @@ namespace IdentityManagement.Services.Console.Application
         private static void ReadContinue()
         {
             System.Console.WriteLine("");
-            System.Console.Write("PRESS ENTER TO CONTINUE ");
+            System.Console.Write("PRESS ENTER TO CONTINUE ->");
             System.Console.ReadKey();
         }
     }

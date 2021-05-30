@@ -1,7 +1,7 @@
 ﻿//
 //  ManageGroups.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Collections.Generic;
@@ -281,23 +281,23 @@ namespace IdentityManagement.Services.Console.Application
         {
             if (groupModel == null)
             {
-                System.Console.WriteLine("{0}information-> unable to locate group", Environment.NewLine);
+                System.Console.WriteLine($"{Environment.NewLine}information-> unable to locate group");
                 return;
             }
 
             System.Console.WriteLine("");
             System.Console.WriteLine("[ GROUP ]");
-            System.Console.WriteLine("- object ID            = {0}", groupModel.Id);
-            System.Console.WriteLine("- security enabled     = {0}", groupModel.SecurityEnabled);
-            System.Console.WriteLine("- created date time    = {0}", groupModel.CreatedDateTime);
-            System.Console.WriteLine("- display name         = {0}", groupModel.DisplayName);
-            System.Console.WriteLine("- description          = {0}", groupModel.Description);
+            System.Console.WriteLine($"- object ID            = {groupModel.Id}");
+            System.Console.WriteLine($"- security enabled     = {groupModel.SecurityEnabled}");
+            System.Console.WriteLine($"- created date time    = {groupModel.CreatedDateTime}");
+            System.Console.WriteLine($"- display name         = {groupModel.DisplayName}");
+            System.Console.WriteLine($"- description          = {groupModel.Description}");
         }
 
         private static void WriteGroupObjectIdentifier(string groupObjectId)
         {
             System.Console.WriteLine("");
-            System.Console.WriteLine("- group object ID      = {0}", groupObjectId);
+            System.Console.WriteLine($"- group object ID      = {groupObjectId}");
         }
 
         private static void WriteGroupMembers(IList<UserModel> groupMembers)
@@ -307,11 +307,11 @@ namespace IdentityManagement.Services.Console.Application
                 return;
             }
 
-            System.Console.WriteLine("                       = group members count     > {0}", groupMembers.Count);
+            System.Console.WriteLine($"                       = group members count     > {groupMembers.Count}");
             foreach (var member in groupMembers)
             {
-                System.Console.WriteLine("- member               = user object ID          > {0}", member.Id);
-                System.Console.WriteLine("-                      = user display name       > {0}", member.DisplayName);
+                System.Console.WriteLine($"- member               = user object ID          > {member.Id}");
+                System.Console.WriteLine($"-                      = user display name       > {member.DisplayName}");
             }
         }
 
@@ -322,11 +322,11 @@ namespace IdentityManagement.Services.Console.Application
                 return;
             }
 
-            System.Console.WriteLine("                       = group owners count      > {0}", groupOwners.Count);
+            System.Console.WriteLine($"                       = group owners count      > {groupOwners.Count}");
             foreach (var member in groupOwners)
             {
-                System.Console.WriteLine("- owner                = user object ID          > {0}", member.Id);
-                System.Console.WriteLine("-                      = user display name       > {0}", member.DisplayName);
+                System.Console.WriteLine($"- owner                = user object ID          > {member.Id}");
+                System.Console.WriteLine($"-                      = user display name       > {member.DisplayName}");
             }
         }
 
@@ -346,13 +346,13 @@ namespace IdentityManagement.Services.Console.Application
         private static void ReadContinue()
         {
             System.Console.WriteLine("");
-            System.Console.Write("PRESS ENTER TO CONTINUE ");
+            System.Console.Write("PRESS ENTER TO CONTINUE ->");
             System.Console.ReadKey();
         }
 
         private static void ReadContinue(bool? status)
         {
-            const string message = "PRESS ENTER TO CONTINUE ";
+            const string message = "PRESS ENTER TO CONTINUE ->";
 
             System.Console.WriteLine("");
             System.Console.Write(status != null ? $"{message}({status}) " : "{message}");

@@ -1,7 +1,7 @@
 ﻿//
 //  UserModel.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System.Collections.Generic;
 using Microsoft.Graph;
@@ -17,8 +17,8 @@ namespace IdentityManagement.Services
         {
             var identity = new ObjectIdentity
             {
-                SignInType = "userName",
-                IssuerAssignedId = username
+                IssuerAssignedId = username,
+                SignInType = "userName"
             };
 
             IList<ObjectIdentity> identities = new List<ObjectIdentity>
@@ -31,7 +31,7 @@ namespace IdentityManagement.Services
 
         public void SetPasswordProfile(string password)
         {
-            PasswordPolicies = "DisablePasswordExpiration,DisableStrongPassword";
+            PasswordPolicies = "DisablePasswordExpiration";
 
             PasswordProfile = new PasswordProfile
             {

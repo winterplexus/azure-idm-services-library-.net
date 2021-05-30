@@ -1,20 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <Authors>Wiregrass Code Technology</Authors>
         <Company>Wiregrass Code Technology</Company>
         <Product>Identity Management Services Library</Product>
-        <Copyright>Copyright © 2020-2021 Wiregrass Code Technology</Copyright>
         <Description>Identity management services console application</Description>
+        <Copyright>Copyright © 2018-2021 Wiregrass Code Technology</Copyright>
         <AssemblyName>IdentityManagement.Services.Console.Application</AssemblyName>
         <RootNamespace>IdentityManagement.Services.Console.Application</RootNamespace>
-        <PackageId>IdentityManagement.Services.Console.Application</PackageId>
-        <SignAssembly>false</SignAssembly>
+        <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>NameKey.snk</AssemblyOriginatorKeyFile>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
-        <Version>1.1.0.0</Version>
+        <Version>1.2.0.0</Version>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -26,7 +25,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0-preview.3.21201.4" />
     </ItemGroup>
 
     <ItemGroup>

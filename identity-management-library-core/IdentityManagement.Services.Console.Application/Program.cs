@@ -1,7 +1,7 @@
 ﻿//
 //  Program.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 namespace IdentityManagement.Services.Console.Application
 {
@@ -9,7 +9,9 @@ namespace IdentityManagement.Services.Console.Application
     {
         private static void Main()
         {
-            IIdentityManager identityManager = new IdentityManager("appsettings.json");
+            const string settingsPath = "appsettings.json";
+
+            IIdentityManager identityManager = new IdentityManager(settingsPath);
 
             var menus = new Menus(identityManager);
             menus.MainMenu();

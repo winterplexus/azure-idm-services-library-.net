@@ -1,19 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <Authors>Wiregrass Code Technology</Authors>
         <Company>Wiregrass Code Technology</Company>
         <Product>Identity Management Services Library</Product>
-        <Copyright>Copyright © 2020-2021 Wiregrass Code Technology</Copyright>
         <Description>Identity management services library</Description>
+        <Copyright>Copyright © 2018-2021 Wiregrass Code Technology</Copyright>
         <AssemblyName>IdentityManagement.Services</AssemblyName>
         <RootNamespace>IdentityManagement.Services</RootNamespace>
-        <PackageId>IdentityManagement.Services</PackageId>
-        <SignAssembly>false</SignAssembly>
+        <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>NameKey.snk</AssemblyOriginatorKeyFile>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
-        <Version>1.1.0.0</Version>
+        <Version>1.2.0.0</Version>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -25,14 +24,15 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Primitives" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.6" />
-        <PackageReference Include="Microsoft.Graph.Beta" Version="0.36.0-preview" />
-        <PackageReference Include="Microsoft.Identity.Client" Version="4.25.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0-preview.3.21201.4" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0-preview.3.21201.4" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="6.0.0-preview.3.21201.4" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0-preview.3.21201.4" />
+        <PackageReference Include="Microsoft.Extensions.Primitives" Version="6.0.0-preview.3.21201.4" />
+        <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.7" />
+        <PackageReference Include="Microsoft.Graph.Beta" Version="4.1.0-preview" />
+        <PackageReference Include="Microsoft.Identity.Client" Version="4.30.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
 </Project>

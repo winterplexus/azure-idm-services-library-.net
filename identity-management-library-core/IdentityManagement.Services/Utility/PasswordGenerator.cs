@@ -1,7 +1,7 @@
 ﻿//
 //  PasswordGenerator.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System;
 
@@ -18,6 +18,7 @@ namespace IdentityManagement.Services
             var random = new Random();
 
             var generated = "!";
+
             for (var i = 1; i <= maximumLowerCase; i++)
             {
                 generated = generated.Insert(random.Next(generated.Length), lowers[random.Next(lowers.Length - 1)].ToString());

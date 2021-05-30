@@ -1,7 +1,7 @@
 ﻿//
 //  IdentityManager.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Globalization;
@@ -19,16 +19,9 @@ namespace IdentityManagement.Services
 
         public string Domain { get; set; }
 
-        public IUserServices UserServices { get; set; }
+        public IUserManagement UserServices { get; set; }
 
-        public IGroupServices GroupServices { get; set; }
-
-        public IdentityManager()
-        {
-            GetConfiguration("appsettings.json");
-            GetGraphClient();
-            SetPublicProperties();
-        }
+        public IGroupManagement GroupServices { get; set; }
 
         public IdentityManager(string settingsPath)
         {
@@ -87,8 +80,8 @@ namespace IdentityManagement.Services
         private void SetPublicProperties()
         {
             Domain = configuration["Domain"];
-            UserServices = new UserServices(client, configuration);
-            GroupServices = new GroupServices(client, UserServices);
+            UserServices = new UserManagement(client, configuration);
+            GroupServices = new GroupManagement(client, UserServices);
         }
 
         private TimeSpan GetTimeout()

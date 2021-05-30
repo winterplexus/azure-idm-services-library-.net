@@ -1,14 +1,14 @@
 ﻿//
-//  IGroupServices.cs
+//  IGroupManagement.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace IdentityManagement.Services
 {
-    public interface IGroupServices
+    public interface IGroupManagement
     {
         Task<GroupModel> GetGroupByGroupName(string groupName);
         Task<GroupModel> GetGroupByObjectId(string groupObjectId);
@@ -16,11 +16,11 @@ namespace IdentityManagement.Services
         Task<IList<GroupModel>> GetGroupsByName(string groupName);
         Task<string> CreateGroup(GroupModel groupModel);
         Task<bool> DeleteGroup(string groupName);
-        Task<bool> AddMemberToGroup(string groupName, string userName);
-        Task<bool> RemoveMemberFromGroup(string groupName, string userName);
+        Task<IList<UserModel>> GetGroupOwners(string groupName);
+        Task<IList<UserModel>> GetGroupMembers(string groupName);
         Task<bool> AddOwnerToGroup(string groupName, string userName);
         Task<bool> RemoveOwnerFromGroup(string groupObjectId, string userName);
-        Task<IList<UserModel>> GetGroupMembers(string groupName);
-        Task<IList<UserModel>> GetGroupOwners(string groupName);
+        Task<bool> AddMemberToGroup(string groupName, string userName);
+        Task<bool> RemoveMemberFromGroup(string groupName, string userName);
     }
 }

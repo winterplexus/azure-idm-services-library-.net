@@ -1,7 +1,7 @@
 ﻿//
 //  StaticClientWithProxyFactory.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Net;
@@ -24,7 +24,7 @@ namespace IdentityManagement.Services
 
             var webProxy = new WebProxy(new Uri(configuration["ProxyUri"]), BypassOnLocal: true)
             {
-                Credentials = !string.IsNullOrEmpty(configuration["ProxyUserName"]) ? CreateCredential(configuration) : CredentialCache.DefaultCredentials
+                Credentials = !string.IsNullOrEmpty(configuration["ProxyUserName"]) ? CreateNetworkCredential(configuration) : CredentialCache.DefaultCredentials
             };
 
             var httpClientHandler = new HttpClientHandler
@@ -41,7 +41,7 @@ namespace IdentityManagement.Services
             return httpClient;
         }
 
-        private static NetworkCredential CreateCredential(IConfiguration configuration)
+        private static NetworkCredential CreateNetworkCredential(IConfiguration configuration)
         {
             return new NetworkCredential(configuration["ProxyUserName"], configuration["ProxyUserPassword"]);
         }

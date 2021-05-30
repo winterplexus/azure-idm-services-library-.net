@@ -1,7 +1,7 @@
 ﻿//
 //  ManageUsers.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Copyright (c) Wiregrass Code Technology 2020-2021
 //
 using System;
 using System.Collections.Generic;
@@ -197,26 +197,6 @@ namespace IdentityManagement.Services.Console.Application
             }
         }
 
-        internal void SetUserPassword()
-        {
-            try
-            {
-                var userName = ReadUserName();
-
-                var replacementPassword = ReadReplacementPassword();
-
-                var status = Task.Run(async () => await identityManager.UserServices.SetUserPasswordByObjectId(userName, replacementPassword).ConfigureAwait(false)).Result;
-
-                ReadContinue(status);
-            }
-            catch (Exception ex)
-            {
-                WriteException(ex);
-
-                ReadContinue(false);
-            }
-        }
-
         internal void CreateUser()
         {
             try
@@ -282,6 +262,26 @@ namespace IdentityManagement.Services.Console.Application
             }
         }
 
+        internal void SetUserPassword()
+        {
+            try
+            {
+                var userName = ReadUserName();
+
+                var replacementPassword = ReadReplacementPassword();
+
+                var status = Task.Run(async () => await identityManager.UserServices.SetUserPasswordByObjectId(userName, replacementPassword).ConfigureAwait(false)).Result;
+
+                ReadContinue(status);
+            }
+            catch (Exception ex)
+            {
+                WriteException(ex);
+
+                ReadContinue(false);
+            }
+        }
+
         private static void WriteUserNotFoundMessage(string identifier)
         {
             System.Console.WriteLine($"{Environment.NewLine}information-> unable to locate user using: {identifier}");
@@ -291,27 +291,33 @@ namespace IdentityManagement.Services.Console.Application
         {
             if (userModel == null)
             {
-                System.Console.WriteLine("{0}information-> unable to locate user", Environment.NewLine);
+                System.Console.WriteLine($"{Environment.NewLine}information-> unable to locate user");
                 return;
             }
 
             System.Console.WriteLine("");
             System.Console.WriteLine("[ USER ]");
-            System.Console.WriteLine("- object ID            = {0}", userModel.Id);
-            System.Console.WriteLine("- assigned ID          = {0}", userModel.AssignedId);
-            System.Console.WriteLine("- account enabled      = {0}", userModel.AccountEnabled);
-            System.Console.WriteLine("- created date time    = {0}", userModel.CreatedDateTime);
-            System.Console.WriteLine("- creation type        = {0}", userModel.CreationType);
-            System.Console.WriteLine("- deleted date time    = {0}", userModel.DeletedDateTime);
-            System.Console.WriteLine("- display name         = {0}", userModel.DisplayName);
-            System.Console.WriteLine("- given name           = {0}", userModel.GivenName);
-            System.Console.WriteLine("- surname              = {0}", userModel.Surname);
-            System.Console.WriteLine("- street address       = {0}", userModel.StreetAddress);
-            System.Console.WriteLine("- city                 = {0}", userModel.City);
-            System.Console.WriteLine("- state                = {0}", userModel.State);
-            System.Console.WriteLine("- postal code          = {0}", userModel.PostalCode);
-            System.Console.WriteLine("- company name         = {0}", userModel.CompanyName);
-            System.Console.WriteLine("- department           = {0}", userModel.Department);
+            System.Console.WriteLine($"- object ID            = {userModel.Id}");
+            System.Console.WriteLine($"- assigned ID          = {userModel.AssignedId}");
+            System.Console.WriteLine($"- account enabled      = {userModel.AccountEnabled}");
+            System.Console.WriteLine($"- created date time    = {userModel.CreatedDateTime}");
+            System.Console.WriteLine($"- creation type        = {userModel.CreationType}");
+            System.Console.WriteLine($"- deleted date time    = {userModel.DeletedDateTime}");
+            System.Console.WriteLine($"- display name         = {userModel.DisplayName}");
+            System.Console.WriteLine($"- given name           = {userModel.GivenName}");
+            System.Console.WriteLine($"- surname              = {userModel.Surname}");
+            System.Console.WriteLine($"- company name         = {userModel.CompanyName}");
+            System.Console.WriteLine($"- department           = {userModel.Department}");
+            System.Console.WriteLine($"- street address       = {userModel.StreetAddress}");
+            System.Console.WriteLine($"- city                 = {userModel.City}");
+            System.Console.WriteLine($"- state                = {userModel.State}");
+            System.Console.WriteLine($"- postal code          = {userModel.PostalCode}");
+            System.Console.WriteLine($"- mail                 = {userModel.Mail}");
+
+            if (userModel.OtherMails != null && userModel.OtherMails.Any())
+            {
+                System.Console.WriteLine($"- alternate mail       = {userModel.OtherMails.ElementAt(0)}");
+            }
 
             WriteUserIdentities(userModel.Identities);
         }
@@ -325,12 +331,12 @@ namespace IdentityManagement.Services.Console.Application
 
             var identitiesList = identities.ToList();
 
-            System.Console.WriteLine("                       = identites count         > {0}", identitiesList.Count);
+            System.Console.WriteLine($"                       = identites count         > {identitiesList.Count}");
             foreach (var identity in identitiesList)
             {
-                System.Console.WriteLine("- identity             = signin type             > {0}", identity.SignInType);
-                System.Console.WriteLine("-                      = issuer                  > {0}", identity.Issuer);
-                System.Console.WriteLine("-                      = issuer assigned ID      > {0}", identity.IssuerAssignedId);
+                System.Console.WriteLine($"- identity             = signin type             > {identity.SignInType}");
+                System.Console.WriteLine($"-                      = issuer                  > {identity.Issuer}");
+                System.Console.WriteLine($"-                      = issuer assigned ID      > {identity.IssuerAssignedId}");
             }
         }
 
@@ -343,18 +349,18 @@ namespace IdentityManagement.Services.Console.Application
 
             var groupList = groups.ToList();
 
-            System.Console.WriteLine("                       = group memberships count > {0}", groupList.Count);
+            System.Console.WriteLine($"                       = group memberships count > {groupList.Count}");
             foreach (var group in groups)
             {
-                System.Console.WriteLine("- group membership     = object ID               > {0}", group.Id);
-                System.Console.WriteLine("-                      = display name            > {0}", group.DisplayName);
+                System.Console.WriteLine($"- group membership     = object ID               > {group.Id}");
+                System.Console.WriteLine($"-                      = display name            > {group.DisplayName}");
             }
         }
 
         private static void WriteUserObjectIdentifier(string userObjectId)
         {
             System.Console.WriteLine("");
-            System.Console.WriteLine("- user object ID       = {0}", userObjectId);
+            System.Console.WriteLine($"- user object ID       = {userObjectId}");
         }
 
         private static void WriteRecordCount(int counter)
@@ -381,13 +387,13 @@ namespace IdentityManagement.Services.Console.Application
         private static void ReadContinue()
         {
             System.Console.WriteLine("");
-            System.Console.Write("PRESS ENTER TO CONTINUE ");
+            System.Console.Write("PRESS ENTER TO CONTINUE ->");
             System.Console.ReadKey();
         }
 
         private static void ReadContinue(bool? status)
         {
-            const string message = "PRESS ENTER TO CONTINUE ";
+            const string message = "PRESS ENTER TO CONTINUE -> ";
 
             System.Console.WriteLine("");
             System.Console.Write(status != null ? $"{message}({status}) " : "{message}");
@@ -430,20 +436,22 @@ namespace IdentityManagement.Services.Console.Application
 
         private static UserModel ReadUser()
         {
-            var username = GetInputField("username", 20);
-            var password = GetInputField("password", 20);
+            var username      = GetInputField("username", 20);
+            var password      = GetInputField("password", 20);
 
             var userModel = new UserModel
             {
-                DisplayName = GetInputField("display name", 20),
-                GivenName = GetInputField("given name", 20),
-                Surname = GetInputField("surname", 20),
+                DisplayName   = GetInputField("display name", 20),
+                GivenName     = GetInputField("given name", 20),
+                Surname       = GetInputField("surname", 20),
+                CompanyName   = GetInputField("company name", 20),
+                Department    = GetInputField("department", 20),
                 StreetAddress = GetInputField("street address", 20),
-                City = GetInputField("city", 20),
-                State = GetInputField("state", 20),
-                PostalCode = GetInputField("postal code", 20),
-                CompanyName = GetInputField("company name", 20),
-                Department = GetInputField("department", 20)
+                City          = GetInputField("city", 20),
+                State         = GetInputField("state", 20),
+                PostalCode    = GetInputField("postal code", 20),
+                Mail          = GetInputField("mail", 20),
+                OtherMails    = GetOtherMails()
             };
 
             userModel.SetIdentity(username);
@@ -457,6 +465,15 @@ namespace IdentityManagement.Services.Console.Application
             System.Console.Write("- replacement password : ");
 
             return System.Console.ReadLine();
+        }
+
+        private static IEnumerable<string> GetOtherMails()
+        {
+            var alternateMail = GetInputField("alternate mail", 20);
+
+            IEnumerable<string> otherMails = new List<string>() { alternateMail };
+
+            return otherMails;
         }
 
         private static string GetInputField(string fieldLabel, int fieldLabelWidth)
