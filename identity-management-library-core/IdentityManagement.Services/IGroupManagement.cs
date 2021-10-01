@@ -1,7 +1,7 @@
 ﻿//
 //  IGroupManagement.cs
 //
-//  Copyright (c) Wiregrass Code Technology 2020-2021
+//  Wiregrass Code Technology 2020-2021
 //
 using System.Collections.Generic;
 using System.Threading.Tasks;
