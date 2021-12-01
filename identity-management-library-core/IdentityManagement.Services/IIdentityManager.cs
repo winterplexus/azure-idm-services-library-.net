@@ -1,13 +1,13 @@
 ﻿//
 //  IIdentityManager.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Wiregrass Code Technology 2020-2022
 //
 namespace IdentityManagement.Services
 {
     public interface IIdentityManager
     {
-        string Domain { get; }
+        string Tenant { get; }
         IUserManagement UserServices { get; }
         IGroupManagement GroupServices { get; }
     }

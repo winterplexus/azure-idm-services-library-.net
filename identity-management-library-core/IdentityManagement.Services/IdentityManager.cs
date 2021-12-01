@@ -1,14 +1,16 @@
 ﻿//
 //  IdentityManager.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Wiregrass Code Technology 2020-2022
 //
 using System;
 using System.Globalization;
+using System.Net;
+using System.Net.Http;
+using Azure.Core.Pipeline;
+using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
-using Microsoft.Graph.Auth;
-using Microsoft.Identity.Client;
 
 namespace IdentityManagement.Services
 {
@@ -17,7 +19,7 @@ namespace IdentityManagement.Services
         private IConfigurationSection configuration;
         private GraphServiceClient client;
 
-        public string Domain { get; set; }
+        public string Tenant { get; set; }
 
         public IUserManagement UserServices { get; set; }
 
@@ -49,37 +51,44 @@ namespace IdentityManagement.Services
 
         private void GetGraphClient()
         {
-            IConfidentialClientApplication confidentialClientApplication;
+            var proxyAddress = configuration["ProxyAddress"];
 
-            var proxyUri = configuration["ProxyUri"];
-            if (string.IsNullOrEmpty(proxyUri))
+            TokenCredentialOptions tokenCredentialOptions;
+
+            if (!string.IsNullOrEmpty(proxyAddress))
             {
-                confidentialClientApplication = ConfidentialClientApplicationBuilder
-                    .Create(configuration["ClientId"])
-                    .WithTenantId(configuration["Domain"])
-                    .WithClientSecret(configuration["ClientSecret"])
-                    .Build();
+                var handler = new HttpClientHandler
+                {
+                    Proxy = new WebProxy(new Uri(proxyAddress))
+                };
+
+                tokenCredentialOptions = new TokenCredentialOptions
+                {
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                    Transport = new HttpClientTransport(handler)
+                };
             }
             else
             {
-                IMsalHttpClientFactory httpClientFactory = new StaticClientWithProxyFactory(configuration);
-
-                confidentialClientApplication = ConfidentialClientApplicationBuilder
-                    .Create(configuration["ClientId"])
-                    .WithTenantId(configuration["Domain"])
-                    .WithClientSecret(configuration["ClientSecret"])
-                    .WithHttpClientFactory(httpClientFactory)
-                    .Build();
+                tokenCredentialOptions = new TokenCredentialOptions
+                {
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+                };
             }
 
-            var authenticationProvider = new ClientCredentialProvider(confidentialClientApplication);
+            var clientSecretCredential = new ClientSecretCredential(configuration["Tenant"],
+                                                                    configuration["ClientId"],
+                                                                    configuration["ClientSecret"],
+                                                                    tokenCredentialOptions);
 
-            client = new GraphServiceClient(authenticationProvider) { HttpProvider = { OverallTimeout = GetTimeout() } };
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            client = new GraphServiceClient(clientSecretCredential, scopes) { HttpProvider = { OverallTimeout = GetTimeout() } };
         }
 
         private void SetPublicProperties()
         {
-            Domain = configuration["Domain"];
+            Tenant = configuration["Tenant"];
             UserServices = new UserManagement(client, configuration);
             GroupServices = new GroupManagement(client, UserServices);
         }

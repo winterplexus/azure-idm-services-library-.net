@@ -1,7 +1,7 @@
 ﻿//
 //  IUserManagement.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Wiregrass Code Technology 2020-2022
 //
 using System.Collections.Generic;
 using System.Threading.Tasks;

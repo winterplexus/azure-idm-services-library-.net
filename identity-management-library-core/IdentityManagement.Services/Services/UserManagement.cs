@@ -1,7 +1,7 @@
 ﻿//
 //  UserManagement.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Wiregrass Code Technology 2020-2022
 //
 using System;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ namespace IdentityManagement.Services
 
             var user = await client.Users
                 .Request()
-                .Filter($"identities/any(c:c/issuerAssignedId eq '{signInName}' and c/issuer eq '{configuration["Domain"]}')")
+                .Filter($"identities/any(c:c/issuerAssignedId eq '{signInName}' and c/issuer eq '{configuration["Tenant"]}')")
                 .Select(u => new
                 {
                     u.Id,
@@ -428,7 +428,7 @@ namespace IdentityManagement.Services
                 {
                     if (identity.SignInType == "userName")
                     {
-                        identity.Issuer = configuration["Domain"];
+                        identity.Issuer = configuration["Tenant"];
                     }
                 }
             }

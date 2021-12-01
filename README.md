@@ -1,7 +1,7 @@
 Azure IDM Services Library for .NET
 ===================================
 
-Azure IDM (identity management) services library based on .NET core platform using Microsoft Identity Client and Microsoft Graph API.
+Azure IDM (identity management) services library based on .NET 6 platform using Microsoft Identity Client and Microsoft Graph API.
 
 IDM services library can provision and manage Azure B2C users and groups using the primary interface:
 

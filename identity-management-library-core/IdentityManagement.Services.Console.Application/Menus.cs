@@ -1,7 +1,7 @@
 ﻿//
 //  Menus.cs
 //
-//  Wiregrass Code Technology 2020-2021
+//  Wiregrass Code Technology 2020-2022
 //
 using System;
 using System.Globalization;
@@ -152,7 +152,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine($"IDENTITY MANAGEMENT: MAIN MENU ({identityManager.Domain})");
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MAIN MENU ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
@@ -167,7 +167,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE USERS MENU ({identityManager.Domain})");
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE USERS MENU ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
@@ -187,7 +187,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE USERS SUBMENU -> GET USERS ({identityManager.Domain})");
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE USERS SUBMENU -> GET USERS ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
@@ -202,7 +202,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE GROUPS MENU ({identityManager.Domain})");
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE GROUPS MENU ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
@@ -224,7 +224,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
-            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE GROUPS SUBMENU -> GET GROUPS ({identityManager.Domain})");
+            System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE GROUPS SUBMENU -> GET GROUPS ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
             System.Console.WriteLine("================================================================================");
