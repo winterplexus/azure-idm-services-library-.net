@@ -1,12 +1,8 @@
 ﻿//
 //  GroupManagement.cs
 //
-//  Wiregrass Code Technology 2020-2022
+//  Wiregrass Code Technology 2020-2023
 //
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Graph;
 
 namespace IdentityManagement.Services
@@ -22,7 +18,51 @@ namespace IdentityManagement.Services
             userServices = userManagemennt;
         }
 
-        public async Task<GroupModel> GetGroupByGroupName(string groupName)
+        public async Task<string> CreateGroup(GroupModel groupModel)
+        {
+            if (groupModel == null)
+            {
+                throw new ArgumentNullException(nameof(groupModel));
+            }
+
+            var group = await client.Groups
+                .Request()
+                .AddAsync(new Group
+                {
+                    Description = groupModel.Description,
+                    DisplayName = groupModel.DisplayName,
+                    GroupTypes = new List<string> { "Unified" },
+                    MailEnabled = true,
+                    MailNickname = groupModel.MailNickname,
+                    SecurityEnabled = false,
+                })
+                .ConfigureAwait(false);
+
+            return group.Id;
+        }
+
+        public async Task<bool> DeleteGroup(string groupName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+            {
+                throw new ArgumentNullException(nameof(groupName));
+            }
+
+            var groupObjectId = GetGroupObjectId(groupName);
+            if (groupObjectId == null)
+            {
+                return false;
+            }
+
+            await client.Groups[groupObjectId]
+                .Request()
+                .DeleteAsync()
+                .ConfigureAwait(false);
+
+            return true;
+        }
+
+        public async Task<GroupModel?> GetGroupByGroupName(string groupName)
         {
             if (string.IsNullOrEmpty(groupName))
             {
@@ -40,12 +80,13 @@ namespace IdentityManagement.Services
                     g.DisplayName,
                     g.Description
                 })
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             return result.CurrentPage.Select(CreateGroupModel).FirstOrDefault();
         }
 
-        public async Task<GroupModel> GetGroupByObjectId(string groupObjectId)
+        public async Task<GroupModel?> GetGroupByObjectId(string groupObjectId)
         {
             if (string.IsNullOrEmpty(groupObjectId))
             {
@@ -62,7 +103,8 @@ namespace IdentityManagement.Services
                     g.DisplayName,
                     g.Description
                 })
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             return result != null ? CreateGroupModel(result) : null;
         }
@@ -85,7 +127,8 @@ namespace IdentityManagement.Services
                     g.DisplayName,
                     g.Description,
                 })
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var groupsList = groups.Select(group => (CreateGroupModel(group))).ToList();
             if (groupsList.Count >= limit)
@@ -97,7 +140,7 @@ namespace IdentityManagement.Services
             {
                 if (groups.NextPageRequest != null)
                 {
-                    groups = await groups.NextPageRequest.GetAsync();
+                    groups = await groups.NextPageRequest.GetAsync().ConfigureAwait(false);
                     groupsList.AddRange(groups.Select(group => (CreateGroupModel(group))));
                 }
                 else
@@ -127,7 +170,8 @@ namespace IdentityManagement.Services
                     g.DisplayName,
                     g.Description,
                 })
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var groupsList = groups.Select(group => (CreateGroupModel(group))).ToList();
 
@@ -135,7 +179,7 @@ namespace IdentityManagement.Services
             {
                 if (groups.NextPageRequest != null)
                 {
-                    groups = await groups.NextPageRequest.GetAsync();
+                    groups = await groups.NextPageRequest.GetAsync().ConfigureAwait(false);
                     groupsList.AddRange(groups.Select(group => (CreateGroupModel(group))));
                 }
                 else
@@ -147,47 +191,7 @@ namespace IdentityManagement.Services
             return groupsList;
         }
 
-        public async Task<string> CreateGroup(GroupModel groupModel)
-        {
-            if (groupModel == null)
-            {
-                throw new ArgumentNullException(nameof(groupModel));
-            }
-
-            var group = await client.Groups
-                .Request()
-                .AddAsync(new Group
-                {
-                    SecurityEnabled = true,
-                    DisplayName = groupModel.DisplayName,
-                    Description = groupModel.Description,
-                    MailEnabled = false
-                });
-
-            return group.Id;
-        }
-
-        public async Task<bool> DeleteGroup(string groupName)
-        {
-            if (string.IsNullOrEmpty(groupName))
-            {
-                throw new ArgumentNullException(nameof(groupName));
-            }
-
-            var groupObjectId = GetGroupObjectId(groupName);
-            if (groupObjectId == null)
-            {
-                return false;
-            }
-
-            await client.Groups[groupObjectId]
-                .Request()
-                .DeleteAsync();
-
-            return true;
-        }
-
-        public async Task<IList<UserModel>> GetGroupOwners(string groupName)
+        public async Task<IList<UserModel?>?> GetGroupOwners(string groupName)
         {
             if (string.IsNullOrEmpty(groupName))
             {
@@ -203,7 +207,8 @@ namespace IdentityManagement.Services
             var group = await client.Groups[groupObjectId]
                 .Request()
                 .Expand("owners")
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var owners = group.Owners;
 
@@ -213,18 +218,20 @@ namespace IdentityManagement.Services
                 return null;
             }
 
-            var groupMembers = new List<UserModel>();
+            var groupMembers = new List<UserModel?>();
 
             do
             {
-                groupMembers.AddRange(owners.Select(owner => userServices.GetUserByObjectId(owner.Id).Result));
+                var result = owners.Select(owner => userServices.GetUserByObjectId(owner.Id).Result);
+
+                groupMembers.AddRange(result);
             }
-            while (owners.NextPageRequest != null && (owners = await owners.NextPageRequest.GetAsync()).Count > 0);
+            while (owners.NextPageRequest != null && (owners = await owners.NextPageRequest.GetAsync().ConfigureAwait(false)).Count > 0);
 
             return groupMembers;
         }
 
-        public async Task<IList<UserModel>> GetGroupMembers(string groupName)
+        public async Task<IList<UserModel?>?> GetGroupMembers(string groupName)
         {
             if (string.IsNullOrEmpty(groupName))
             {
@@ -240,7 +247,8 @@ namespace IdentityManagement.Services
             var group = await client.Groups[groupObjectId]
                 .Request()
                 .Expand("members")
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var members = group.Members;
 
@@ -250,13 +258,15 @@ namespace IdentityManagement.Services
                 return null;
             }
 
-            var groupMembers = new List<UserModel>();
+            var groupMembers = new List<UserModel?>();
 
             do
             {
-                groupMembers.AddRange(members.Select(member => userServices.GetUserByObjectId(member.Id).Result));
+                var result = members.Select(member => userServices.GetUserByObjectId(member.Id).Result);
+
+                groupMembers.AddRange(result);
             }
-            while (members.NextPageRequest != null && (members = await members.NextPageRequest.GetAsync()).Count > 0);
+            while (members.NextPageRequest != null && (members = await members.NextPageRequest.GetAsync().ConfigureAwait(false)).Count > 0);
 
             return groupMembers;
         }
@@ -290,7 +300,8 @@ namespace IdentityManagement.Services
 
             await client.Groups[groupObjectId].Owners.References
                 .Request()
-                .AddAsync(userDirectoryObject);
+                .AddAsync(userDirectoryObject)
+                .ConfigureAwait(false);
 
             return true;
         }
@@ -319,7 +330,8 @@ namespace IdentityManagement.Services
 
             await client.Groups[groupObjectId].Owners[userObjectId].Reference
                 .Request()
-                .DeleteAsync();
+                .DeleteAsync()
+                .ConfigureAwait(false);
 
             return true;
         }
@@ -353,7 +365,8 @@ namespace IdentityManagement.Services
 
             await client.Groups[groupObjectId].Members.References
                 .Request()
-                .AddAsync(userDirectoryObject);
+                .AddAsync(userDirectoryObject)
+                .ConfigureAwait(false);
 
             return true;
         }
@@ -382,23 +395,10 @@ namespace IdentityManagement.Services
 
             await client.Groups[groupObjectId].Members[userObjectId].Reference
                 .Request()
-                .DeleteAsync();
+                .DeleteAsync()
+                .ConfigureAwait(false);
 
             return true;
-        }
-
-        private string GetGroupObjectId(string groupName)
-        {
-            var group = Task.Run(async () => await GetGroupByGroupName(groupName)).Result;
-
-            return group?.Id;
-        }
-
-        private string GetUserObjectId(string userName)
-        {
-            var user = Task.Run(async () => await userServices.GetUserBySignInName(userName)).Result;
-
-            return user?.Id;
         }
 
         private static GroupModel CreateGroupModel(Group group)
@@ -412,6 +412,18 @@ namespace IdentityManagement.Services
                 Description = group.Description
             };
             return groupModel;
+        }
+
+        private string? GetGroupObjectId(string groupName)
+        {
+            var group = Task.Run(async () => await GetGroupByGroupName(groupName).ConfigureAwait(false)).Result;
+            return group?.Id;
+        }
+
+        private string? GetUserObjectId(string userName)
+        {
+            var user = Task.Run(async () => await userServices.GetUserBySignInName(userName).ConfigureAwait(false)).Result;
+            return user?.Id;
         }
     }
 }

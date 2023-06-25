@@ -1,7 +1,7 @@
 ﻿//
 //  GroupModel.cs
 //
-//  Wiregrass Code Technology 2020-2022
+//  Wiregrass Code Technology 2020-2023
 //
 using Microsoft.Graph;
 using Newtonsoft.Json;

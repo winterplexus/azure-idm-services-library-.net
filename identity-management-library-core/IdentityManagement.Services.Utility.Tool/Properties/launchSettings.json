@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "IdentityManagement.Services.Utility.Tool": {
+      "commandName": "Project"
+    }
+  }
+}

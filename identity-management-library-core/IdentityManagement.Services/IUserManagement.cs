@@ -1,24 +1,21 @@
 ﻿//
 //  IUserManagement.cs
 //
-//  Wiregrass Code Technology 2020-2022
+//  Wiregrass Code Technology 2020-2023
 //
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace IdentityManagement.Services
 {
     public interface IUserManagement
     {
-        Task<UserModel> GetUserBySignInName(string signInName);
-        Task<UserModel> GetUserByDisplayName(string displayName);
-        Task<UserModel> GetUserByObjectId(string userObjectId);
-        Task<string> CreateUser(UserModel userModel);
+        Task<string?> CreateUser(UserModel userModel);
         Task<bool> DeleteUser(string userName);
-        Task<bool> SetUserPasswordByObjectId(string userName, string replacementPassword);
+        Task<UserModel?> GetUserBySignInName(string signInName);
+        Task<UserModel?> GetUserByDisplayName(string displayName);
+        Task<UserModel?> GetUserByObjectId(string userObjectId);
         Task<IList<UserModel>> GetUsers(int limit);
-        Task<IList<UserModel>> GetUsersByName(string displayName);
-        Task<IList<GroupModel>> GetGroupMembershipBySignInName(string userName);
-        string GetUserName(UserModel userModel);
+        Task<IList<UserModel>> GetUsersByDisplayName(string displayName);
+        Task<IList<GroupModel>?> GetGroupMembershipBySignInName(string signInName);
+        string? GetUserName(UserModel userModel);
+        Task<bool> SetUserPasswordByObjectId(string userName, string replacementPassword);
     }
 }

@@ -1,14 +1,13 @@
 ﻿//
 //  Menus.cs
 //
-//  Wiregrass Code Technology 2020-2022
+//  Wiregrass Code Technology 2020-2023
 //
-using System;
 using System.Globalization;
 
 namespace IdentityManagement.Services.Console.Application
 {
-    internal class Menus
+    internal sealed class Menus
     {
         private readonly IIdentityManager identityManager;
 
@@ -17,7 +16,7 @@ namespace IdentityManagement.Services.Console.Application
             this.identityManager = identityManager;
         }
 
-        internal void MainMenu()
+        internal async Task MainMenu()
         {
             try
             {
@@ -28,22 +27,30 @@ namespace IdentityManagement.Services.Console.Application
                     var command = ReadMenuOption();
                     switch (command)
                     {
-                        case "U": ProcessManageUsersMenu();
+                        case "U": await ProcessManageUsersMenu().ConfigureAwait(false);
                                   break;
-                        case "G": ProcessManageGroupsMenu();
+                        case "G": await ProcessManageGroupsMenu().ConfigureAwait(false);
                                   break;
                         case "X": return;
+                        default:  return;
                     }
                 }
             }
-            catch (Exception ex)
+            catch (IdentityManagerException ime)
             {
-                WriteUnexpectedException(ex);
+                WriteExceptionMessage(ime);
+            }
+            catch (ArgumentNullException ane)
+            {
+                WriteExceptionMessage(ane);
+            }
+            finally
+            {
                 ReadContinue();
             }
         }
 
-        private void ProcessManageUsersMenu()
+        private async Task ProcessManageUsersMenu()
         {
             var manageUsers = new ManageUsers(identityManager);
 
@@ -54,26 +61,27 @@ namespace IdentityManagement.Services.Console.Application
                 var command = ReadMenuOption();
                 switch (command)
                 {
-                    case "1": manageUsers.GetUserBySignInName();
+                    case "1": await manageUsers.GetUserBySignInName().ConfigureAwait(false);
                               break;
-                    case "2": manageUsers.GetUserByDisplayName();
+                    case "2": await manageUsers.GetUserByDisplayName().ConfigureAwait(false);
                               break;
-                    case "3": manageUsers.GetUserByObjectId();
+                    case "3": await manageUsers.GetUserByObjectId().ConfigureAwait(false);
                               break;
-                    case "4": ProcessManageUsersSubmenu();
+                    case "4": await ProcessManageUsersSubmenu().ConfigureAwait(false);
                               break;
-                    case "5": manageUsers.CreateUser();
+                    case "5": await manageUsers.CreateUser().ConfigureAwait(false);
                               break;
-                    case "6": manageUsers.DeleteUser();
+                    case "6": await manageUsers.DeleteUser().ConfigureAwait(false);
                               break;
-                    case "7": manageUsers.SetUserPassword();
+                    case "7": await manageUsers.SetUserPassword().ConfigureAwait(false);
                               break;
                     case "M": return;
+                    default:  return;
                 }
             }
         }
 
-        private void ProcessManageUsersSubmenu()
+        private async Task ProcessManageUsersSubmenu()
         {
             var manageUsers = new ManageUsers(identityManager);
 
@@ -84,16 +92,17 @@ namespace IdentityManagement.Services.Console.Application
                 var command = ReadMenuOption();
                 switch (command)
                 {
-                    case "1": manageUsers.GetUsers();
+                    case "1": await manageUsers.GetUsers().ConfigureAwait(false);
                               break;
-                    case "2": manageUsers.GetUsersByName();
+                    case "2": await manageUsers.GetUsersByName().ConfigureAwait(false);
                               break;
                     case "R": return;
+                    default:  return;
                 }
             }
         }
 
-        private void ProcessManageGroupsMenu()
+        private async Task ProcessManageGroupsMenu()
         {
             var manageGroups = new ManageGroups(identityManager);
 
@@ -104,30 +113,31 @@ namespace IdentityManagement.Services.Console.Application
                 var command = ReadMenuOption();
                 switch (command)
                 {
-                    case "1": manageGroups.GetGroupByGroupName();
+                    case "1": await manageGroups.GetGroupByGroupName().ConfigureAwait(false);
                               break;
-                    case "2": manageGroups.GetGroupByObjectId();
+                    case "2": await manageGroups.GetGroupByObjectId().ConfigureAwait(false);
                               break;
-                    case "3": ProcessManageGroupsSubmenu();
+                    case "3": await ProcessManageGroupsSubmenu().ConfigureAwait(false);
                               break;
-                    case "4": manageGroups.CreateGroup();
+                    case "4": await manageGroups.CreateGroup().ConfigureAwait(false);
                               break;
-                    case "5": manageGroups.DeleteGroup();
+                    case "5": await manageGroups.DeleteGroup().ConfigureAwait(false);
                               break;
-                    case "6": manageGroups.AddOwnerToGroup();
+                    case "6": await manageGroups.AddOwnerToGroup().ConfigureAwait(false);
                               break;
-                    case "7": manageGroups.RemoveOwnerToGroup();
+                    case "7": await manageGroups.RemoveOwnerToGroup().ConfigureAwait(false);
                               break;
-                    case "8": manageGroups.AddMemberToGroup();
+                    case "8": await manageGroups.AddMemberToGroup().ConfigureAwait(false);
                               break;
-                    case "9": manageGroups.RemoveMemberToGroup();
+                    case "9": await manageGroups.RemoveMemberToGroup().ConfigureAwait(false);
                               break;
                     case "M": return;
+                    default:  return;
                 }
             }
         }
 
-        private void ProcessManageGroupsSubmenu()
+        private async Task ProcessManageGroupsSubmenu()
         {
             var manageGroups = new ManageGroups(identityManager);
 
@@ -138,13 +148,31 @@ namespace IdentityManagement.Services.Console.Application
                 var command = ReadMenuOption();
                 switch (command)
                 {
-                    case "1": manageGroups.GetGroups();
+                    case "1": await manageGroups.GetGroups().ConfigureAwait(false);
                               break;
-                    case "2": manageGroups.GetGroupsByName();
+                    case "2": await manageGroups.GetGroupsByName().ConfigureAwait(false);
                               break;
                     case "R": return;
+                    default:  return;
                 }
             }
+        }
+
+        private static string ReadMenuOption()
+
+        {
+            System.Console.WriteLine("");
+            System.Console.Write("ENTER COMMAND AND PRESS ENTER: ");
+
+            var command = System.Console.ReadLine();
+            return !string.IsNullOrEmpty(command) ? command.ToUpper(CultureInfo.CurrentCulture) : "X";
+        }
+
+        private static void ReadContinue()
+        {
+            System.Console.WriteLine("");
+            System.Console.Write("PRESS ENTER TO CONTINUE");
+            System.Console.ReadKey();
         }
 
         private void WriteMainMenu()
@@ -152,6 +180,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
+            System.Console.WriteLine("");
             System.Console.WriteLine($"IDENTITY MANAGEMENT: MAIN MENU ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
@@ -167,6 +196,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
+            System.Console.WriteLine("");
             System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE USERS MENU ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
@@ -187,6 +217,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
+            System.Console.WriteLine("");
             System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE USERS SUBMENU -> GET USERS ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
@@ -202,6 +233,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
+            System.Console.WriteLine("");
             System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE GROUPS MENU ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
@@ -224,6 +256,7 @@ namespace IdentityManagement.Services.Console.Application
 #if _ENABLE_CLS
             System.Console.Clear();
 #endif
+            System.Console.WriteLine("");
             System.Console.WriteLine($"IDENTITY MANAGEMENT: MANAGE GROUPS SUBMENU -> GET GROUPS ({identityManager.Tenant})");
             System.Console.WriteLine("");
             System.Console.WriteLine("COMMAND DESCRIPTION");
@@ -234,30 +267,13 @@ namespace IdentityManagement.Services.Console.Application
             System.Console.WriteLine("================================================================================");
         }
 
-        private static void WriteUnexpectedException(Exception ex)
+        private static void WriteExceptionMessage(Exception ex)
         {
             System.Console.ForegroundColor = ConsoleColor.Red;
-            System.Console.WriteLine($"unexcepted exception-> {ex.Message}");
-            System.Console.WriteLine($"inner exception-> {ex.InnerException?.Message}");
-            System.Console.WriteLine($"stack trace-> {Environment.NewLine}{ex.StackTrace}");
+            System.Console.WriteLine($"UNEXPECTED EXCEPTION-> {ex.Message}");
+            System.Console.WriteLine($"INNER EXCEPTION-> {ex.InnerException?.Message}");
+            System.Console.WriteLine($"STACK TRACE-> {Environment.NewLine}{ex.StackTrace}");
             System.Console.ResetColor();
-        }
-
-        private static string ReadMenuOption()
-
-        {
-            System.Console.WriteLine("");
-            System.Console.Write("ENTER COMMAND AND PRESS ENTER: ");
-
-            var command = System.Console.ReadLine();
-            return !string.IsNullOrEmpty(command) ? command.ToUpper(CultureInfo.CurrentCulture) : "X";
-        }
-
-        private static void ReadContinue()
-        {
-            System.Console.WriteLine("");
-            System.Console.Write("PRESS ENTER TO CONTINUE ->");
-            System.Console.ReadKey();
         }
     }
 }

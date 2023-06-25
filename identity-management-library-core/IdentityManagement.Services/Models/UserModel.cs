@@ -1,9 +1,8 @@
 ﻿//
 //  UserModel.cs
 //
-//  Wiregrass Code Technology 2020-2022
+//  Wiregrass Code Technology 2020-2023
 //
-using System.Collections.Generic;
 using Microsoft.Graph;
 using Newtonsoft.Json;
 
@@ -11,7 +10,7 @@ namespace IdentityManagement.Services
 {
     public class UserModel : User
     {
-        public string AssignedId { get; set; }
+        public string? AssignedId { get; set; }
 
         public void SetIdentity(string username)
         {

@@ -1,12 +1,8 @@
 ﻿//
 //  UserManagement.cs
 //
-//  Wiregrass Code Technology 2020-2022
+//  Wiregrass Code Technology 2020-2023
 //
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 
@@ -23,7 +19,39 @@ namespace IdentityManagement.Services
             configuration = configurationSection;
         }
 
-        public async Task<UserModel> GetUserBySignInName(string signInName)
+        public async Task<string?> CreateUser(UserModel userModel)
+        {
+            if (userModel == null)
+            {
+                throw new ArgumentNullException(nameof(userModel));
+            }
+
+            SetIdentityIssuer(userModel);
+
+            var user = await client.Users.Request().AddAsync(userModel).ConfigureAwait(false);
+
+            return user.Id;
+        }
+
+        public async Task<bool> DeleteUser(string userName)
+        {
+            if (string.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+
+            var userObjectId = GetUserObjectId(userName);
+            if (userObjectId == null)
+            {
+                return false;
+            }
+
+            await client.Users[userObjectId].Request().DeleteAsync().ConfigureAwait(false);
+
+            return true;
+        }
+
+        public async Task<UserModel?> GetUserBySignInName(string signInName)
         {
             if (string.IsNullOrEmpty(signInName))
             {
@@ -53,12 +81,15 @@ namespace IdentityManagement.Services
                     u.Mail,
                     u.OtherMails
                 })
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
-            return user.CurrentPage.Select(CreateUserModel).FirstOrDefault();
+            var result = user.CurrentPage.Select(CreateUserModel).FirstOrDefault();
+
+            return result;
         }
 
-        public async Task<UserModel> GetUserByDisplayName(string displayName)
+        public async Task<UserModel?> GetUserByDisplayName(string displayName)
         {
             if (string.IsNullOrEmpty(displayName))
             {
@@ -88,12 +119,15 @@ namespace IdentityManagement.Services
                     u.Mail,
                     u.OtherMails
                 })
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
-            return user.CurrentPage.Select(CreateUserModel).FirstOrDefault();
+            var result = user.CurrentPage.Select(CreateUserModel).FirstOrDefault();
+
+            return result;
         }
 
-        public async Task<UserModel> GetUserByObjectId(string userObjectId)
+        public async Task<UserModel?> GetUserByObjectId(string userObjectId)
         {
             if (string.IsNullOrEmpty(userObjectId))
             {
@@ -124,89 +158,21 @@ namespace IdentityManagement.Services
                         u.Mail,
                         u.OtherMails
                     })
-                    .GetAsync();
+                    .GetAsync()
+                    .ConfigureAwait(false);
 
-                return user != null ? CreateUserModel(user) : null;
+                var result = user != null ? CreateUserModel(user) : null;
+
+                return result;
             }
             catch (ServiceException se)
             {
-                if (se.Error.Code.Equals("Request_ResourceNotFound", StringComparison.CurrentCulture))
+                if (se.Error.Code.Equals("Request_ResourceNotFound", StringComparison.Ordinal))
                 {
                     return null;
                 }
                 throw;
             }
-        }
-
-        public async Task<string> CreateUser(UserModel userModel)
-        {
-            if (userModel == null)
-            {
-                throw new ArgumentNullException(nameof(userModel));
-            }
-
-            SetIdentityIssuer(userModel);
-
-            var user = await client.Users
-                .Request()
-                .AddAsync(userModel);
-
-            return user.Id;
-        }
-
-        public async Task<bool> DeleteUser(string userName)
-        {
-            if (string.IsNullOrEmpty(userName))
-            {
-                throw new ArgumentNullException(nameof(userName));
-            }
-
-            var userObjectId = GetUserObjectId(userName);
-            if (userObjectId == null)
-            {
-                return false;
-            }
-
-            await client.Users[userObjectId]
-                .Request()
-                .DeleteAsync();
-
-            return true;
-        }
-
-        public async Task<bool> SetUserPasswordByObjectId(string userName, string replacementPassword)
-        {
-            if (string.IsNullOrEmpty(userName))
-            {
-                throw new ArgumentNullException(nameof(userName));
-            }
-
-            if (string.IsNullOrEmpty(replacementPassword))
-            {
-                throw new ArgumentNullException(nameof(replacementPassword));
-            }
-
-            var userObjectId = GetUserObjectId(userName);
-            if (userObjectId == null)
-            {
-                return false;
-            }
-
-            var user = new User
-            {
-                PasswordPolicies = "DisablePasswordExpiration",
-                PasswordProfile = new PasswordProfile
-                {
-                    ForceChangePasswordNextSignIn = false,
-                    Password = replacementPassword
-                }
-            };
-
-            await client.Users[userObjectId]
-                .Request()
-                .UpdateAsync(user);
-
-            return true;
         }
 
         public async Task<IList<UserModel>> GetUsers(int limit)
@@ -239,7 +205,8 @@ namespace IdentityManagement.Services
                     u.Mail,
                     u.OtherMails
                 })
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var usersList = users.Select(user => (CreateUserModel(user))).ToList();
             if (usersList.Count >= limit)
@@ -251,7 +218,7 @@ namespace IdentityManagement.Services
             {
                 if (users.NextPageRequest != null)
                 {
-                    users = await users.NextPageRequest.GetAsync();
+                    users = await users.NextPageRequest.GetAsync().ConfigureAwait(false);
                     usersList.AddRange(users.Select(user => (CreateUserModel(user))));
                 }
                 else
@@ -263,7 +230,7 @@ namespace IdentityManagement.Services
             return usersList;
         }
 
-        public async Task<IList<UserModel>> GetUsersByName(string displayName)
+        public async Task<IList<UserModel>> GetUsersByDisplayName(string displayName)
         {
             if (string.IsNullOrEmpty(displayName))
             {
@@ -293,7 +260,8 @@ namespace IdentityManagement.Services
                     u.Mail,
                     u.OtherMails
                 })
-                .GetAsync();
+                .GetAsync()
+                .ConfigureAwait(false);
 
             var usersList = users.Select(user => (CreateUserModel(user))).ToList();
 
@@ -301,7 +269,7 @@ namespace IdentityManagement.Services
             {
                 if (users.NextPageRequest != null)
                 {
-                    users = await users.NextPageRequest.GetAsync();
+                    users = await users.NextPageRequest.GetAsync().ConfigureAwait(false);
                     usersList.AddRange(users.Select(user => (CreateUserModel(user))));
                 }
                 else
@@ -313,34 +281,32 @@ namespace IdentityManagement.Services
             return usersList;
         }
 
-        public async Task<IList<GroupModel>> GetGroupMembershipBySignInName(string userName)
+        public async Task<IList<GroupModel>?> GetGroupMembershipBySignInName(string signInName)
         {
-            if (string.IsNullOrEmpty(userName))
+            if (string.IsNullOrEmpty(signInName))
             {
-                throw new ArgumentNullException(nameof(userName));
+                throw new ArgumentNullException(nameof(signInName));
             }
 
-            var userObjectId = GetUserObjectId(userName);
+            var userObjectId = GetUserObjectId(signInName);
             if (userObjectId == null)
             {
                 return null;
             }
 
-            var memberOf = await client.Users[userObjectId].MemberOf
-                .Request()
-                .GetAsync();
-
+            var memberOf = await client.Users[userObjectId].MemberOf.Request().GetAsync().ConfigureAwait(false);
             var groupMembership = memberOf.Select(member => new GroupModel
             {
                 Id = member.Id,
                 DisplayName = GetGroupDisplayName(member.Id).Result.DisplayName
-            }).ToList();
+            })
+            .ToList();
 
             do
             {
                 if (memberOf.NextPageRequest != null)
                 {
-                    memberOf = await memberOf.NextPageRequest.GetAsync();
+                    memberOf = await memberOf.NextPageRequest.GetAsync().ConfigureAwait(false);
                     groupMembership.AddRange(memberOf.Select(member => new GroupModel
                     {
                         Id = member.Id,
@@ -356,7 +322,7 @@ namespace IdentityManagement.Services
             return groupMembership;
         }
 
-        public string GetUserName(UserModel userModel)
+        public string? GetUserName(UserModel userModel)
         {
             if (userModel == null)
             {
@@ -364,18 +330,44 @@ namespace IdentityManagement.Services
             }
 
             var username = (from identity in userModel.Identities where !string.IsNullOrWhiteSpace(identity.SignInType)
-                                where  identity.SignInType == "emailAddress" ||
-                                       identity.SignInType == "userName"
+                                where  identity.SignInType == "emailAddress" || 
+                                       identity.SignInType == "userName" 
                                 select identity.IssuerAssignedId).FirstOrDefault();
 
             return username;
         }
 
-        private string GetUserObjectId(string userName)
+        public async Task<bool> SetUserPasswordByObjectId(string userName, string replacementPassword)
         {
-            var user = Task.Run(async () => await GetUserBySignInName(userName)).Result;
+            if (string.IsNullOrEmpty(userName))
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
 
-            return user?.Id;
+            if (string.IsNullOrEmpty(replacementPassword))
+            {
+                throw new ArgumentNullException(nameof(replacementPassword));
+            }
+
+            var userObjectId = GetUserObjectId(userName);
+            if (userObjectId == null)
+            {
+                return false;
+            }
+
+            var user = new User
+            {
+                PasswordPolicies = "DisablePasswordExpiration",
+                PasswordProfile = new PasswordProfile
+                {
+                    Password = replacementPassword,
+                    ForceChangePasswordNextSignIn = false
+                }
+            };
+
+            await client.Users[userObjectId].Request().UpdateAsync(user).ConfigureAwait(false);
+
+            return true;
         }
 
         private static UserModel CreateUserModel(User user)
@@ -407,10 +399,11 @@ namespace IdentityManagement.Services
                     SignInType = identity.SignInType,
                     Issuer = identity.Issuer,
                     IssuerAssignedId = identity.IssuerAssignedId
-                }).ToList();
+                })
+                .ToList();
 
                 userModel.AssignedId = (from identity in user.Identities where !string.IsNullOrWhiteSpace(identity.SignInType)
-                                            where  identity.SignInType == "emailAddress" ||
+                                            where  identity.SignInType == "emailAddress" || 
                                                    identity.SignInType == "userName"
                                             select identity.IssuerAssignedId).FirstOrDefault();
 
@@ -418,6 +411,26 @@ namespace IdentityManagement.Services
             }
 
             return userModel;
+        }
+
+        private string? GetUserObjectId(string userName)
+        {
+            var user = Task.Run(async () => await GetUserBySignInName(userName).ConfigureAwait(false)).Result;
+            return user?.Id;
+        }
+
+        private async Task<Group> GetGroupDisplayName(string groupObjectId)
+        {
+            var group = await client.Groups[groupObjectId]
+                .Request()
+                .Select(g => new
+                {
+                    g.DisplayName
+                })
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            return group;
         }
 
         private void SetIdentityIssuer(UserModel userModel)
@@ -432,19 +445,6 @@ namespace IdentityManagement.Services
                     }
                 }
             }
-        }
-
-        private async Task<Group> GetGroupDisplayName(string groupObjectId)
-        {
-            var group = await client.Groups[groupObjectId]
-                .Request()
-                .Select(g => new
-                {
-                    g.DisplayName
-                })
-                .GetAsync();
-
-            return group;
         }
     }
 }

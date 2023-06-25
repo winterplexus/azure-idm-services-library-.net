@@ -1,12 +1,10 @@
 ﻿//
 //  IdentityManager.cs
 //
-//  Wiregrass Code Technology 2020-2022
+//  Wiregrass Code Technology 2020-2023
 //
-using System;
 using System.Globalization;
 using System.Net;
-using System.Net.Http;
 using Azure.Core.Pipeline;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
@@ -16,14 +14,14 @@ namespace IdentityManagement.Services
 {
     public class IdentityManager : IIdentityManager
     {
-        private IConfigurationSection configuration;
-        private GraphServiceClient client;
+        private IConfigurationSection? configuration;
+        private GraphServiceClient? client;
 
-        public string Tenant { get; set; }
+        public string? Tenant { get; set; }
 
-        public IUserManagement UserServices { get; set; }
+        public IUserManagement? UserServices { get; set; }
 
-        public IGroupManagement GroupServices { get; set; }
+        public IGroupManagement? GroupServices { get; set; }
 
         public IdentityManager(string settingsPath)
         {
@@ -51,16 +49,19 @@ namespace IdentityManagement.Services
 
         private void GetGraphClient()
         {
+            if (configuration == null)
+            {
+                throw new IdentityManagerException("configuration object is null");
+            }
+
             var proxyAddress = configuration["ProxyAddress"];
 
             TokenCredentialOptions tokenCredentialOptions;
 
             if (!string.IsNullOrEmpty(proxyAddress))
             {
-                var handler = new HttpClientHandler
-                {
-                    Proxy = new WebProxy(new Uri(proxyAddress))
-                };
+                using var handler = new HttpClientHandler();
+                handler.Proxy = new WebProxy(new Uri(proxyAddress));
 
                 tokenCredentialOptions = new TokenCredentialOptions
                 {
@@ -88,6 +89,15 @@ namespace IdentityManagement.Services
 
         private void SetPublicProperties()
         {
+            if (configuration == null)
+            {
+                throw new IdentityManagerException("configuration object is null");
+            }
+            if (client == null)
+            {
+                throw new IdentityManagerException("client object is null");
+            }
+
             Tenant = configuration["Tenant"];
             UserServices = new UserManagement(client, configuration);
             GroupServices = new GroupManagement(client, UserServices);
@@ -95,10 +105,17 @@ namespace IdentityManagement.Services
 
         private TimeSpan GetTimeout()
         {
-            double seconds = 5;
-            if (!string.IsNullOrEmpty(configuration["Timeout"]))
+            if (configuration == null)
             {
-                seconds = double.Parse(configuration["Timeout"], CultureInfo.InvariantCulture);
+                throw new IdentityManagerException("configuration object is null");
+            }
+
+            var timeout = configuration["Timeout"];
+
+            double seconds = 5;
+            if (!string.IsNullOrEmpty(timeout))
+            {
+                seconds = double.Parse(timeout, CultureInfo.InvariantCulture);
             }
             return TimeSpan.FromSeconds(seconds);
         }
